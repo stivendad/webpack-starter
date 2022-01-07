@@ -34,7 +34,7 @@ export const crearTodoHtml = (todo) => {
 txtInput.addEventListener('keyup', (event) => {
     
     if (event.keyCode === 13 && txtInput.value.length > 0) {
-            console.log(txtInput.value);
+            // console.log(txtInput.value); // Se utiliza para validar el valor agregado despues de presionar enter keycode=13
             const nuevoTodo = new Todo( txtInput.value );
             todoList.nuevoTodo(nuevoTodo);
             
@@ -59,8 +59,11 @@ divTodoList.addEventListener('click', (event) => {
     if(nombreElemento.includes('input')) { // click en el chek
         todoList.marcarCompletado( todoId );
         todoElemento.classList.toggle('completed');
-    } 
+    } else if(nombreElemento.includes('button')) {
+        
+        todoList.eliminarTodo( todoId );
+        divTodoList.removeChild( todoElemento );
 
-    console.log(todoList);
+    }
 
 });
