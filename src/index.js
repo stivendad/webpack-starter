@@ -5,13 +5,18 @@ import { crearTodoHtml } from './js/componentes';
 
 export const todoList = new TodoList();
 
-
-const tarea = new Todo('Aprender JavaScript!!');
-todoList.nuevoTodo(tarea);
-
-tarea.completado = false;
+todoList.todos.forEach(todo => crearTodoHtml(todo));
 
 
-console.log(todoList);
+// const tarea = new Todo('Aprender JavaScript!!');
+// todoList.nuevoTodo(tarea);
 
-crearTodoHtml( tarea );
+// tarea.completado = false;
+
+
+// console.log(todoList);
+
+// crearTodoHtml( tarea );
+
+
+// localStorage.setItem('mi-key', 'ABC123');
