@@ -2,85 +2,105 @@ import { Todo } from "../classes";
 import { todoList, TodoList } from "../index";
 
 // Referencias en el html
-const divTodoList = document.querySelector('.todo-list');
-const txtInput = document.querySelector('.new-todo');
-const btnBorrarCompletados = document.querySelector('.clear-completed');
-
+const divTodoList = document.querySelector(".todo-list");
+const txtInput = document.querySelector(".new-todo");
+const btnBorrarCompletados = document.querySelector(".clear-completed");
+const ulFiltros = document.querySelector(".filters");
+const anchorFiltros = document.querySelectorAll(".filtro");
 
 export const crearTodoHtml = (todo) => {
-
-    const htmlTodo = `
-    <li class="${ (todo.completado) ? 'completed' : '' }" data-id="${ todo.id }">
+  const htmlTodo = `
+    <li class="${todo.completado ? "completed" : ""}" data-id="${todo.id}">
         <div class="view">
-            <input class="toggle" type="checkbox" ${ (todo.completado) ?  'checked' : ''}>
-            <label>${ todo.tarea }</label>
+            <input class="toggle" type="checkbox" ${
+              todo.completado ? "checked" : ""
+            }>
+            <label>${todo.tarea}</label>
             <button class="destroy"></button>
         </div>
         <input class="edit" value="Create a TodoMVC template">
     </li>`;
 
-    const div = document.createElement('div');
-    div.innerHTML = htmlTodo;
+  const div = document.createElement("div");
+  div.innerHTML = htmlTodo;
 
+  divTodoList.append(div.firstElementChild);
 
-    divTodoList.append( div.firstElementChild );
+  return div.firstElementChild;
+};
 
-    return div.firstElementChild;
+// Eventos
 
-}
+txtInput.addEventListener("keyup", (event) => {
+  if (event.keyCode === 13 && txtInput.value.length > 0) {
+    // console.log(txtInput.value); // Se utiliza para validar el valor agregado despues de presionar enter keycode=13
+    const nuevoTodo = new Todo(txtInput.value);
+    todoList.nuevoTodo(nuevoTodo);
 
+    // Agregando al html el nuevo Todo
+    crearTodoHtml(nuevoTodo);
 
-// Eventos 
-
-txtInput.addEventListener('keyup', (event) => {
-    
-    if (event.keyCode === 13 && txtInput.value.length > 0) {
-            // console.log(txtInput.value); // Se utiliza para validar el valor agregado despues de presionar enter keycode=13
-            const nuevoTodo = new Todo( txtInput.value );
-            todoList.nuevoTodo(nuevoTodo);
-            
-            // Agregando al html el nuevo Todo
-            crearTodoHtml(nuevoTodo);
-            
-            // Limpiando el campo input
-            txtInput.value = '';
-    }
-
+    // Limpiando el campo input
+    txtInput.value = "";
+  }
 });
 
+divTodoList.addEventListener("click", (event) => {
+  // console.log('click');
+  // console.log(event.target.localName);
+  const nombreElemento = event.target.localName;
+  const todoElemento = event.target.parentElement.parentElement;
+  const todoId = todoElemento.getAttribute("data-id");
 
-divTodoList.addEventListener('click', (event) => {
-
-    // console.log('click');
-    // console.log(event.target.localName);
-    const nombreElemento = event.target.localName;
-    const todoElemento = event.target.parentElement.parentElement;
-    const todoId = todoElemento.getAttribute('data-id');
-
-    if(nombreElemento.includes('input')) { // click en el chek
-        todoList.marcarCompletado( todoId );
-        todoElemento.classList.toggle('completed');
-    } else if(nombreElemento.includes('button')) {
-        
-        todoList.eliminarTodo( todoId );
-        divTodoList.removeChild( todoElemento );
-
-    }
-
+  if (nombreElemento.includes("input")) {
+    // click en el chek
+    todoList.marcarCompletado(todoId);
+    todoElemento.classList.toggle("completed");
+  } else if (nombreElemento.includes("button")) {
+    todoList.eliminarTodo(todoId);
+    divTodoList.removeChild(todoElemento);
+  }
 });
 
-btnBorrarCompletados.addEventListener('click', () => {
+btnBorrarCompletados.addEventListener("click", () => {
+  todoList.eliminarCompletados();
 
-    todoList.eliminarCompletados();
+  for (let i = divTodoList.children.length - 1; i >= 0; i--) {
+    const elemento = divTodoList.children[i];
 
-    for( let i = divTodoList.children.length-1; i >= 0; i-- ) {
+    if (elemento.classList.contains("completed")) {
+      divTodoList.removeChild(elemento);
+    }
+  }
+});
 
-        const elemento = divTodoList.children[i];
+ulFiltros.addEventListener("click", (event) => {
+//   console.log(event.target.text);
+  const filtro = event.target.text;
+  if (!filtro) {
+    return;
+  }
 
-        if( elemento.classList.contains('completed') ) {
-            divTodoList.removeChild(elemento);
+  anchorFiltros.forEach(elem => elem.classList.remove('selected'));
+  event.target.classList.add('selected');
+
+
+  for (const elemento of divTodoList.children) {
+    elemento.classList.remove("hidden");
+    const completado = elemento.classList.contains("completed");
+    // console.log(elemento.classList.contains("completed"));
+
+    switch (filtro) {
+      case "Pendientes":
+        if (completado) {
+          elemento.classList.add("hidden");
         }
-
+        break;
+      case "Completados":
+        if (!completado) {
+          elemento.classList.add("hidden");
+        }
+        break;
     }
-
+  }
 });
